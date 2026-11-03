@@ -1,0 +1,137 @@
+<?php
+
+/**
+ * @file
+ * Adds the Draft Preflight panel to the content edit form.
+ */
+
+use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Routing\RouteMatchInterface;
+use Drupal\Core\Url;
+
+/**
+ * Implements hook_help().
+ */
+function plagx_draft_preflight_help($route_name, RouteMatchInterface $route_match) {
+  if ($route_name === 'help.page.plagx_draft_preflight') {
+    return '<p>' . t('Plagx Draft Preflight adds a <em>Draft Preflight</em> panel to the content edit form. Click <em>Check draft</em> to review word count and reading time, in-text citations against the reference list, punctuation and basic grammar. The text is checked in the browser and is never sent anywhere. Set defaults on the <a href=":url">settings page</a>.', [
+      ':url' => Url::fromRoute('plagx_draft_preflight.settings')->toString(),
+    ]) . '</p>';
+  }
+  return NULL;
+}
+
+/**
+ * Implements hook_form_BASE_FORM_ID_alter() for node_form.
+ */
+function plagx_draft_preflight_form_node_form_alter(array &$form, FormStateInterface $form_state, $form_id) {
+  $config = \Drupal::config('plagx_draft_preflight.settings');
+  $min = (int) $config->get('min_words');
+  $max = (int) $config->get('max_words');
+  $style = $config->get('style') === 'mla' ? 'mla' : 'apa';
+  $module_path = \Drupal::service('extension.list.module')->getPath('plagx_draft_preflight');
+
+  $form['plagx_draft_preflight'] = [
+    '#type' => 'details',
+    '#title' => t('Draft Preflight'),
+    '#group' => 'advanced',
+    '#weight' => -20,
+    '#open' => TRUE,
+    '#attributes' => ['class' => ['plagx-preflight'], 'data-checks' => implode(',', (array) $config->get('checks'))],
+    '#attached' => ['library' => ['plagx_draft_preflight/editor']],
+    '#cache' => ['tags' => $config->getCacheTags()],
+    'plagx_brand' => [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#attributes' => ['class' => ['plagx-preflight__brand']],
+      'icon' => [
+        '#theme' => 'image',
+        '#uri' => $module_path . '/images/pcx-icon.png',
+        '#width' => 20,
+        '#height' => 20,
+        '#alt' => '',
+      ],
+      'text' => ['#type' => 'html_tag', '#tag' => 'span', '#value' => t('Check your draft before you publish.')],
+    ],
+    'plagx_fields' => [
+      '#type' => 'container',
+      '#attributes' => ['class' => ['plagx-preflight__fields']],
+      'plagx_min' => plagx_draft_preflight_number(t('Min words'), 'minWords', $min),
+      'plagx_max' => plagx_draft_preflight_number(t('Max words'), 'maxWords', $max),
+      'plagx_style' => [
+        '#type' => 'html_tag',
+        '#tag' => 'label',
+        '#attributes' => ['class' => ['plagx-field', 'plagx-field--wide']],
+        'label' => ['#type' => 'html_tag', '#tag' => 'span', '#value' => t('Citations')],
+        'select' => [
+          '#type' => 'html_tag',
+          '#tag' => 'select',
+          '#attributes' => ['data-field' => 'style'],
+          'apa' => plagx_draft_preflight_option('apa', t('APA'), $style),
+          'mla' => plagx_draft_preflight_option('mla', t('MLA'), $style),
+        ],
+      ],
+    ],
+    'plagx_check' => [
+      '#type' => 'html_tag',
+      '#tag' => 'button',
+      '#value' => t('Check draft'),
+      '#attributes' => ['type' => 'button', 'class' => ['plagx-button'], 'data-action' => 'check'],
+    ],
+    'plagx_result' => [
+      '#type' => 'html_tag',
+      '#tag' => 'div',
+      '#value' => '',
+      '#attributes' => ['class' => ['plagx-preflight__result'], 'aria-live' => 'polite'],
+    ],
+    'plagx_note' => [
+      '#type' => 'html_tag',
+      '#tag' => 'p',
+      '#value' => t('Automated suggestions only. Your text is checked in your browser and never leaves this page.'),
+      '#attributes' => ['class' => ['plagx-preflight__note']],
+    ],
+  ];
+}
+
+/**
+ * Builds a labelled number input for the Draft Preflight panel.
+ *
+ * These inputs have no name, so they are never submitted with the node form.
+ */
+function plagx_draft_preflight_number($label, $field, $value) {
+  return [
+    '#type' => 'html_tag',
+    '#tag' => 'label',
+    '#attributes' => ['class' => ['plagx-field']],
+    'label' => ['#type' => 'html_tag', '#tag' => 'span', '#value' => $label],
+    'input' => [
+      '#type' => 'html_tag',
+      '#tag' => 'input',
+      '#attributes' => [
+        'type' => 'number',
+        'min' => '0',
+        'step' => '1',
+        'inputmode' => 'numeric',
+        'placeholder' => '0',
+        'data-field' => $field,
+        'value' => $value > 0 ? (string) $value : '',
+      ],
+    ],
+  ];
+}
+
+/**
+ * Builds one option of the citation style select.
+ */
+function plagx_draft_preflight_option($value, $label, $selected) {
+  $attributes = ['value' => $value];
+  if ($value === $selected) {
+    $attributes['selected'] = 'selected';
+  }
+  return [
+    '#type' => 'html_tag',
+    '#tag' => 'option',
+    '#value' => $label,
+    '#attributes' => $attributes,
+  ];
+}

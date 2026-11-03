@@ -1,0 +1,7 @@
+plagx_draft_preflight.settings:
+  path: '/admin/config/content/plagx-draft-preflight'
+  defaults:
+    _form: '\Drupal\plagx_draft_preflight\Form\SettingsForm'
+    _title: 'Draft Preflight'
+  requirements:
+    _permission: 'administer site configuration'

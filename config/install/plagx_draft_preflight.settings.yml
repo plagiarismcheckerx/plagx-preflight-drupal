@@ -1,0 +1,8 @@
+min_words: 0
+max_words: 0
+style: apa
+checks:
+  - length
+  - references
+  - punctuation
+  - grammar

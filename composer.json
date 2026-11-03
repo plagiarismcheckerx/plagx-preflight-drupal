@@ -1,0 +1,19 @@
+{
+    "name": "drupal/plagx_draft_preflight",
+    "description": "Check content before you publish: word count, reading time, citations against the reference list, punctuation and basic grammar suggestions.",
+    "type": "drupal-module",
+    "license": "GPL-2.0-or-later",
+    "homepage": "https://www.drupal.org/project/plagx_draft_preflight",
+    "authors": [
+        {
+            "name": "Plagiarism Checker X",
+            "homepage": "https://plagiarismcheckerx.com/"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/plagiarismcheckerx/plagx-preflight-drupal"
+    },
+    "require": {
+        "drupal/core": "^10.3 || ^11"
+    }
+}

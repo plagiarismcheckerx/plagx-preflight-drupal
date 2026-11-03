@@ -1,0 +1,12 @@
+{
+  "name": "plagx-draft-preflight-drupal",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test",
+    "sync": "sh scripts/sync-lib.sh"
+  },
+  "devDependencies": {
+    "linkedom": "0.18.15"
+  }
+}

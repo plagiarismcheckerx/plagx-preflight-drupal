@@ -1,0 +1,5 @@
+plagx_draft_preflight.settings:
+  title: 'Draft Preflight'
+  description: 'Default word limits, citation style and checks for the Draft Preflight panel.'
+  parent: system.admin_config_content
+  route_name: plagx_draft_preflight.settings

@@ -1,0 +1,6 @@
+name: 'Plagx Draft Preflight'
+type: module
+description: 'Check content before you publish: word count and reading time, in-text citations against the reference list, punctuation and basic grammar suggestions. Runs in the browser.'
+package: Content authoring
+core_version_requirement: ^10.3 || ^11
+configure: plagx_draft_preflight.settings
