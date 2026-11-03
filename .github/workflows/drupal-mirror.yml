@@ -1,0 +1,29 @@
+name: Mirror to Drupal.org
+
+# Pushes main to the Drupal.org 1.0.x branch, and tags such as v1.0.0 to Drupal.org as 1.0.0.
+# Needs the repository secret DRUPALCODE_TOKEN: a git.drupalcode.org access token with write_repository.
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+
+permissions:
+  contents: read
+
+jobs:
+  mirror:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+      - name: Push to git.drupalcode.org
+        env:
+          TOKEN: ${{ secrets.DRUPALCODE_TOKEN }}
+        run: |
+          remote="https://plagiarismcheckerx:${TOKEN}@git.drupalcode.org/project/plagx_draft_preflight.git"
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            git push "$remote" "refs/tags/${GITHUB_REF_NAME}:refs/tags/${GITHUB_REF_NAME#v}"
+          else
+            git push "$remote" "HEAD:refs/heads/1.0.x"
+          fi
