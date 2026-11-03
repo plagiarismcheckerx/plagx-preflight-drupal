@@ -49,6 +49,9 @@ export function htmlToText(html) {
     .join('\n\n');
 }
 
+/** "1 warning", "2 warnings". */
+const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
 function el(tag, className, text) {
   const node = document.createElement(tag);
   if (className) node.className = className;
@@ -73,9 +76,9 @@ function render(box, result) {
   }
   const pills = el('div', 'plagx-pills');
   pills.append(
-    el('span', `plagx-pill${result.errors ? ' is-error' : ''}`, `${result.errors} errors`),
-    el('span', `plagx-pill${result.warnings ? ' is-warning' : ''}`, `${result.warnings} warnings`),
-    el('span', `plagx-pill${result.infos ? ' is-info' : ''}`, `${result.infos} suggestions`),
+    el('span', `plagx-pill${result.errors ? ' is-error' : ''}`, count(result.errors, 'error')),
+    el('span', `plagx-pill${result.warnings ? ' is-warning' : ''}`, count(result.warnings, 'warning')),
+    el('span', `plagx-pill${result.infos ? ' is-info' : ''}`, count(result.infos, 'suggestion')),
   );
   out.append(tiles, pills);
   if (!result.issues.length) {
